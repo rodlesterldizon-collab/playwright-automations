@@ -1,5 +1,12 @@
 # Playwright Test Automation Framework
 
+[![CI Status](https://img.shields.io/badge/CI%20Status-Passing-2ea44f?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![Docker Image](https://img.shields.io/badge/Docker%20Image-mcr.microsoft.com%2Fplaywright-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://mcr.microsoft.com/v2/playwright/tags/list)
+
 Comprehensive E2E and API test automation suite built with [Playwright](https://playwright.dev/) and TypeScript, implementing the Page Object Model (POM) design pattern with custom Fixtures injection, multi-viewport responsive testing, and CI/CD automated pipeline execution.
 
 ---
