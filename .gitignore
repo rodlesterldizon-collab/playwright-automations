@@ -4,3 +4,4 @@ test-results/
 .env.tests
 .DS_Store
 *.log
+src/

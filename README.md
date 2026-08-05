@@ -211,8 +211,8 @@ Run test suites targeted by specific directories or layers:
 
 Automated workflow (`.github/workflows/playwright.yml`):
 - **Official Playwright Docker Image**: Runs inside `mcr.microsoft.com/playwright:v1.62.1-jammy` with pre-installed browser binaries (Chromium, Firefox, WebKit) and OS-level dependencies.
-- **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` prevents redundant browser binary downloads during `npm ci`, saving 1–2 minutes per run.
-- **Deterministic Dependency Lockfile**: `package-lock.json` is generated and tracked in Git so that `npm ci` completes deterministically in CI environments without lockfile errors.
+- **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` prevents redundant browser binary downloads during dependency installation, saving 1–2 minutes per run.
+- **Robust Dependency Resolution**: `npm install` gracefully resolves cross-platform optional binaries inside the Linux Playwright Docker container.
 - **Dependency Caching**: Utilizes `actions/cache@v4` on `~/.npm` keyed against `package-lock.json` for rapid step execution.
 - **Secrets & Environment Integration**: Consumes GitHub Secrets (`PLAYWRIGHT_BASE_URL`, `CONTENT_API_BASE_URL`, `SPACE_ID`, `ACCESS_TOKEN`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, etc.).
 - **Artifact Generation**: Automatically uploads interactive HTML Playwright execution report artifacts retained for 30 days.
