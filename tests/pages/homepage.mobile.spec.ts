@@ -1,35 +1,30 @@
-import { test, expect } from "@playwright/test";
-import { setupCmsPage, CmsContent, getHomeData } from "../helpers.js";
-import { HomePage } from "../pom/HomePage.js";
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
+import { getHomeData } from "../helpers.js";
 
 test.describe("Public Landing Homepage Mobile Viewport Spec (375x812)", () => {
-  let home: CmsContent;
-  let homePage: HomePage;
   const homeData = getHomeData();
 
-  test.beforeEach(async ({ page, request }) => {
-    homePage = new HomePage(page, request);
+  test.beforeEach(async ({ page }) => {
     // Set viewport to iPhone X size
     await page.setViewportSize({ width: 375, height: 812 });
-    home = await setupCmsPage(page, request, "home", "/");
   });
 
   // ─── Mobile Hero Section ──────────────────────────────────────────────────────
 
-  test("[Test_01] should render mobile hero section with visible branding and CTAs", async () => {
+  test("[Test_01] should render mobile hero section with visible branding and CTAs", async ({ homePage, homeCms }) => {
     const { hero } = homePage;
-    await expect(hero.getBadgeText(home.hero.badge)).toBeVisible();
-    await expect(hero.getTitleText(home.hero.titlePrefix)).toBeVisible();
+    await expect(hero.getBadgeText(homeCms.hero.badge)).toBeVisible();
+    await expect(hero.getTitleText(homeCms.hero.titlePrefix)).toBeVisible();
     await expect(hero.description).toBeVisible();
-    await expect(hero.getServicesCta(home.hero.ctaServices)).toBeVisible();
-    await expect(hero.getHireCta(home.hero.ctaHire)).toBeVisible();
+    await expect(hero.getServicesCta(homeCms.hero.ctaServices)).toBeVisible();
+    await expect(hero.getHireCta(homeCms.hero.ctaHire)).toBeVisible();
   });
 
   // ─── Mobile Stats Grid ───────────────────────────────────────────────────────
 
-  test("[Test_02] should render stacked stats grid with all CMS values on mobile", async () => {
+  test("[Test_02] should render stacked stats grid with all CMS values on mobile", async ({ homePage, homeCms }) => {
     const { stats } = homePage;
-    for (const item of home.stats.items) {
+    for (const item of homeCms.stats.items) {
       await expect(stats.getStatValue(item.value)).toBeVisible();
       await expect(stats.getStatLabel(item.label)).toBeVisible();
     }
@@ -37,13 +32,13 @@ test.describe("Public Landing Homepage Mobile Viewport Spec (375x812)", () => {
 
   // ─── Mobile About Section ─────────────────────────────────────────────────────
 
-  test("[Test_03] should render mission section and all 4 feature cards on mobile viewport", async () => {
+  test("[Test_03] should render mission section and all 4 feature cards on mobile viewport", async ({ homePage, homeCms }) => {
     const { about } = homePage;
-    await expect(about.getTitle(home.about.title)).toBeVisible();
-    await expect(about.getDescription(home.about.description)).toBeVisible();
+    await expect(about.getTitle(homeCms.about.title)).toBeVisible();
+    await expect(about.getDescription(homeCms.about.description)).toBeVisible();
 
-    for (let i = 0; i < home.about.features.length; i++) {
-      const feature = home.about.features[i];
+    for (let i = 0; i < homeCms.about.features.length; i++) {
+      const feature = homeCms.about.features[i];
       await expect(about.getFeatureTitle(i)).toContainText(feature.title);
       await expect(about.getFeatureDescription(i)).toContainText(feature.description);
     }
@@ -51,8 +46,8 @@ test.describe("Public Landing Homepage Mobile Viewport Spec (375x812)", () => {
 
   // ─── Mobile Services Grid ─────────────────────────────────────────────────────
 
-  test("[Test_04] should render all 4 service cards in mobile stacked layout", async () => {
-    const { services } = home;
+  test("[Test_04] should render all 4 service cards in mobile stacked layout", async ({ homePage, homeCms }) => {
+    const { services } = homeCms;
     const { services: servicesSection } = homePage;
     await expect(servicesSection.title).toHaveText(services.title);
 
@@ -64,8 +59,8 @@ test.describe("Public Landing Homepage Mobile Viewport Spec (375x812)", () => {
 
   // ─── Mobile Contact Form ──────────────────────────────────────────────────────
 
-  test("[Test_05] should allow typing and dispatching consultation form on mobile", async ({ page }) => {
-    const { form } = home.contact;
+  test("[Test_05] should allow typing and dispatching consultation form on mobile", async ({ page, homePage, homeCms }) => {
+    const { form } = homeCms.contact;
     const inputData = homeData.consultationForm.mobile;
     const { contact: contactSection } = homePage;
 

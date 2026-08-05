@@ -1,26 +1,14 @@
-import { test, expect } from "@playwright/test";
-import { loginProgrammatic, getCaregiverCredentials } from "../helpers.js";
-import { EmployeePortalPage } from "../pom/EmployeePortalPage.js";
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
 
 test.describe("Employee/Caregiver Operational Portal Page Spec", () => {
-  test.beforeEach(async ({ context }) => {
-    // Authenticate programmatically bypassing the login form to isolate tests.
-    // IMPORTANT: Must use context.request (not the standalone request fixture) so
-    // the session cookie is shared with the browser page context automatically.
-    const credentials = getCaregiverCredentials();
-    await loginProgrammatic(context, context.request, credentials.email, credentials.password);
-  });
-
-  test("[Test_01] should render the welcome banner dynamically with personal profile credentials", async ({ page, request }) => {
-    const portalPage = new EmployeePortalPage(page, request);
+  test("[Test_01] should render the welcome banner dynamically with personal profile credentials", async ({ page, employeePortalPage }) => {
     await page.goto("/dashboard");
 
     // Assert dynamic profile welcome banner
-    await expect(portalPage.welcomeBanner).toBeVisible();
+    await expect(employeePortalPage.welcomeBanner).toBeVisible();
   });
 
-  test("[Test_02] should handle shift clock-in/out and completion triggers with button-locking state controls", async ({ page, request }) => {
-    const portalPage = new EmployeePortalPage(page, request);
+  test("[Test_02] should handle shift clock-in/out and completion triggers with button-locking state controls", async ({ page, employeePortalPage }) => {
     await page.goto("/dashboard");
 
     // Intercept API clock actions and monitor requests
@@ -31,41 +19,39 @@ test.describe("Employee/Caregiver Operational Portal Page Spec", () => {
     const clockInResponsePromise = page.waitForResponse("**/api/admin/clock-action");
 
     // 1. Select the first available shift from the list (using the label radio wrapper)
-    await portalPage.shiftSelectorFirst.check({ force: true });
+    await employeePortalPage.shiftSelectorFirst.check({ force: true });
 
     // 2. Click 'Clock In' and assert button is locked/disabled and API is dispatched
-    await expect(portalPage.clockInButton).toBeVisible();
-    await portalPage.clockInButton.click();
+    await expect(employeePortalPage.clockInButton).toBeVisible();
+    await employeePortalPage.clockInButton.click();
 
     // Wait for endpoint handshake
     const clockInResponse = await clockInResponsePromise;
     expect(clockInResponse.status()).toBe(200);
 
     // Verify clock in button is now disabled to prevent spamming
-    await expect(portalPage.clockInButton).toBeDisabled();
+    await expect(employeePortalPage.clockInButton).toBeDisabled();
 
     // 3. Click 'Clock Out' and assert button is disabled and API dispatched
     const clockOutResponsePromise = page.waitForResponse("**/api/admin/clock-action");
-    await expect(portalPage.clockOutButton).toBeVisible();
-    await portalPage.clockOutButton.click();
+    await expect(employeePortalPage.clockOutButton).toBeVisible();
+    await employeePortalPage.clockOutButton.click();
 
     const clockOutResponse = await clockOutResponsePromise;
     expect(clockOutResponse.status()).toBe(200);
-    await expect(portalPage.clockOutButton).toBeDisabled();
+    await expect(employeePortalPage.clockOutButton).toBeDisabled();
 
     // 4. Click 'Complete' and assert shift status updates
     const completeResponsePromise = page.waitForResponse("**/api/admin/clock-action");
-    await expect(portalPage.completeButton).toBeVisible();
-    await portalPage.completeButton.click();
+    await expect(employeePortalPage.completeButton).toBeVisible();
+    await employeePortalPage.completeButton.click();
 
     const completeResponse = await completeResponsePromise;
     expect(completeResponse.status()).toBe(200);
-    await expect(portalPage.completeButton).toBeDisabled();
+    await expect(employeePortalPage.completeButton).toBeDisabled();
   });
 
-  test.skip("[Test_03] should prompt an Inactivity Security Alert warning at the idle threshold boundary and support resets", async ({ page, request }) => {
-    const portalPage = new EmployeePortalPage(page, request);
-
+  test.skip("[Test_03] should prompt an Inactivity Security Alert warning at the idle threshold boundary and support resets", async ({ page, employeePortalPage }) => {
     // Install the Playwright Clock before navigation to mock timers
     await page.clock.install();
 
@@ -75,15 +61,14 @@ test.describe("Employee/Caregiver Operational Portal Page Spec", () => {
     await page.clock.fastForward(9 * 60 * 1000 + 5000);
 
     // Assert secure inactivity warning modal is prompt
-    await expect(portalPage.inactivityAlertTitle).toBeVisible();
+    await expect(employeePortalPage.inactivityAlertTitle).toBeVisible();
 
     // Clicking 'Stay Logged In' must dismiss warning and reset activity trackers
-    await portalPage.stayLoggedInButton.click();
-    await expect(portalPage.inactivityAlertTitle).not.toBeVisible();
+    await employeePortalPage.stayLoggedInButton.click();
+    await expect(employeePortalPage.inactivityAlertTitle).not.toBeVisible();
   });
 
-  test.skip("[Test_04] should force automated logout and purge session state if the countdown warning is fully ignored", async ({ page, request }) => {
-    const portalPage = new EmployeePortalPage(page, request);
+  test.skip("[Test_04] should force automated logout and purge session state if the countdown warning is fully ignored", async ({ page, employeePortalPage }) => {
     await page.clock.install();
 
     await page.goto("/dashboard");
@@ -93,7 +78,7 @@ test.describe("Employee/Caregiver Operational Portal Page Spec", () => {
 
     // Assert session purges automatically and forces redirect back to the entry login screen
     await expect(page).toHaveURL(/\/login/);
-    await expect(portalPage.sessionTimeoutMessage).toBeVisible();
+    await expect(employeePortalPage.sessionTimeoutMessage).toBeVisible();
 
     // Verify cookies and sessions are completely deleted
     const cookies = await page.context().cookies();

@@ -1,22 +1,17 @@
-import { test, expect } from "@playwright/test";
-import { setupCmsPage, CmsContent, getPartnersData } from "../helpers.js";
-import { PartnersPage } from "../pom/PartnersPage.js";
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
+import { getPartnersData } from "../helpers.js";
 
 test.describe("Corporate Partnerships Mobile Viewport Spec (375x812)", () => {
-  let corp: CmsContent;
-  let partnersPage: PartnersPage;
   const partnersData = getPartnersData();
 
-  test.beforeEach(async ({ page, request }) => {
-    partnersPage = new PartnersPage(page, request);
+  test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    corp = await setupCmsPage(page, request, "corporate", "/partners");
   });
 
   // ─── Mobile Hero Section ──────────────────────────────────────────────────────
 
-  test("[Test_01] should render corporate hero section with visible branding and CTAs on mobile", async () => {
-    const { navigation, hero } = corp;
+  test("[Test_01] should render corporate hero section with visible branding and CTAs on mobile", async ({ partnersPage, corporateCms }) => {
+    const { navigation, hero } = corporateCms;
     const { hero: heroSection } = partnersPage;
 
     await expect(heroSection.getBadgeText(navigation.badge)).toBeVisible();
@@ -27,8 +22,8 @@ test.describe("Corporate Partnerships Mobile Viewport Spec (375x812)", () => {
 
   // ─── Mobile Bento Grid ────────────────────────────────────────────────────────
 
-  test("[Test_02] should render stacked bento feature cards on mobile viewport", async () => {
-    const { features } = corp;
+  test("[Test_02] should render stacked bento feature cards on mobile viewport", async ({ partnersPage, corporateCms }) => {
+    const { features } = corporateCms;
     const { features: featuresSection } = partnersPage;
 
     await expect(featuresSection.title).toContainText(features.absoluteReliability.title);
@@ -47,8 +42,8 @@ test.describe("Corporate Partnerships Mobile Viewport Spec (375x812)", () => {
 
   // ─── Mobile ROI Calculator ────────────────────────────────────────────────────
 
-  test("[Test_03] should allow slider interaction and display ROI impact on mobile screens", async () => {
-    const { calculator } = corp;
+  test("[Test_03] should allow slider interaction and display ROI impact on mobile screens", async ({ partnersPage, corporateCms }) => {
+    const { calculator } = corporateCms;
     const { calculator: calcSection } = partnersPage;
 
     await expect(calcSection.getTitle(calculator.title)).toBeVisible();
@@ -63,8 +58,8 @@ test.describe("Corporate Partnerships Mobile Viewport Spec (375x812)", () => {
 
   // ─── Mobile Inquiry Form ──────────────────────────────────────────────────────
 
-  test("[Test_04] should submit corporate partnership inquiry on mobile screen", async ({ page }) => {
-    const { inquiry } = corp;
+  test("[Test_04] should submit corporate partnership inquiry on mobile screen", async ({ page, partnersPage, corporateCms }) => {
+    const { inquiry } = corporateCms;
     const { inquiry: inquirySection } = partnersPage;
     const inputData = partnersData.inquiryForm.mobile;
 

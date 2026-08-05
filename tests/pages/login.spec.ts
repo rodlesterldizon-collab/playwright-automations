@@ -1,17 +1,11 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pom/LoginPage.js";
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
 import { getAuthData } from "../helpers.js";
 
 test.describe("Staff Identity & Access Management Spec", () => {
-  let loginPage: LoginPage;
   const authData = getAuthData();
 
-  test.beforeEach(async ({ page, request }) => {
-    loginPage = new LoginPage(page, request);
+  test("[Test_01] should display the core login forms and visual credentials input", async ({ page, loginPage }) => {
     await page.goto("/login");
-  });
-
-  test("[Test_01] should display the core login forms and visual credentials input", async () => {
     await expect(loginPage.pageTitle).toBeVisible();
     await expect(loginPage.sectionHeading).toBeVisible();
     await expect(loginPage.sectionSubheading).toBeVisible();
@@ -21,7 +15,9 @@ test.describe("Staff Identity & Access Management Spec", () => {
     await expect(loginPage.contactItSupportLink).toBeVisible();
   });
 
-  test("[Test_02] should display the modal when forgot password is pressed", async ({ page }) => {
+  test("[Test_02] should display the modal when forgot password is pressed", async ({ page, loginPage }) => {
+    await page.goto("/login");
+
     // Register dialog handler before trigger
     page.on("dialog", async (dialog) => {
       expect(dialog.message()).toContain(
@@ -33,7 +29,9 @@ test.describe("Staff Identity & Access Management Spec", () => {
     await loginPage.forgotPasswordLink.click();
   });
 
-  test.skip("[Test_03] should trigger contact IT support slide-down form and dispatch an access request", async ({ page }) => {
+  test.skip("[Test_03] should trigger contact IT support slide-down form and dispatch an access request", async ({ page, loginPage }) => {
+    await page.goto("/login");
+
     await page.route("**/api/auth/request-access", async (route) => {
       await route.fulfill({ status: 200, json: { success: true } });
     });
@@ -57,7 +55,9 @@ test.describe("Staff Identity & Access Management Spec", () => {
     await expect(loginPage.requestSubmittedMessage).toBeVisible();
   });
 
-  test.skip("[Test_04] should handle SSO Google Multi-Environment Authentication", async ({ page }) => {
+  test.skip("[Test_04] should handle SSO Google Multi-Environment Authentication", async ({ page, loginPage }) => {
+    await page.goto("/login");
+
     // Setup popup listener or window open evaluation
     const popupPromise = page.waitForEvent("popup");
     await loginPage.googleSsoButton.click();

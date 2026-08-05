@@ -1,22 +1,17 @@
-import { test, expect } from "@playwright/test";
-import { setupCmsPage, CmsContent, getPartnersData } from "../helpers.js";
-import { PartnersPage } from "../pom/PartnersPage.js";
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
+import { getPartnersData } from "../helpers.js";
 
 test.describe("Corporate Partnerships Tablet Viewport Spec (768x1024)", () => {
-  let corp: CmsContent;
-  let partnersPage: PartnersPage;
   const partnersData = getPartnersData();
 
-  test.beforeEach(async ({ page, request }) => {
-    partnersPage = new PartnersPage(page, request);
+  test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
-    corp = await setupCmsPage(page, request, "corporate", "/partners");
   });
 
   // ─── Tablet Hero Section ──────────────────────────────────────────────────────
 
-  test("[Test_01] should render corporate hero section with visible branding and CTAs on tablet", async () => {
-    const { navigation, hero } = corp;
+  test("[Test_01] should render corporate hero section with visible branding and CTAs on tablet", async ({ partnersPage, corporateCms }) => {
+    const { navigation, hero } = corporateCms;
     const { hero: heroSection } = partnersPage;
 
     await expect(heroSection.getBadgeText(navigation.badge)).toBeVisible();
@@ -27,8 +22,8 @@ test.describe("Corporate Partnerships Tablet Viewport Spec (768x1024)", () => {
 
   // ─── Tablet Bento Grid ────────────────────────────────────────────────────────
 
-  test("[Test_02] should render bento feature cards in tablet grid layout", async () => {
-    const { features } = corp;
+  test("[Test_02] should render bento feature cards in tablet grid layout", async ({ partnersPage, corporateCms }) => {
+    const { features } = corporateCms;
     const { features: featuresSection } = partnersPage;
 
     await expect(featuresSection.title).toContainText(features.absoluteReliability.title);
@@ -47,8 +42,8 @@ test.describe("Corporate Partnerships Tablet Viewport Spec (768x1024)", () => {
 
   // ─── Tablet ROI Calculator ────────────────────────────────────────────────────
 
-  test("[Test_03] should allow slider interaction and display ROI impact on tablet screens", async () => {
-    const { calculator } = corp;
+  test("[Test_03] should allow slider interaction and display ROI impact on tablet screens", async ({ partnersPage, corporateCms }) => {
+    const { calculator } = corporateCms;
     const { calculator: calcSection } = partnersPage;
 
     await expect(calcSection.getTitle(calculator.title)).toBeVisible();
@@ -63,8 +58,8 @@ test.describe("Corporate Partnerships Tablet Viewport Spec (768x1024)", () => {
 
   // ─── Tablet Inquiry Form ──────────────────────────────────────────────────────
 
-  test("[Test_04] should submit corporate partnership inquiry on tablet screen", async ({ page }) => {
-    const { inquiry } = corp;
+  test("[Test_04] should submit corporate partnership inquiry on tablet screen", async ({ page, partnersPage, corporateCms }) => {
+    const { inquiry } = corporateCms;
     const { inquiry: inquirySection } = partnersPage;
     const inputData = partnersData.inquiryForm.tablet;
 

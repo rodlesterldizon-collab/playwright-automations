@@ -1,44 +1,29 @@
-import { test as base, expect } from "@playwright/test";
-import { setupCmsPage, fetchCmsContent, CmsContent, getHomeData } from "../helpers.js";
-import { HomePage } from "../pom/HomePage.js";
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
+import { getHomeData } from "../helpers.js";
 
 const homeData = getHomeData();
-
-const test = base.extend<{
-  homePage: HomePage;
-  home: CmsContent;
-}>({
-  homePage: async ({ page, request }, use) => {
-    await setupCmsPage(page, request, "home", "/");
-    await use(new HomePage(page, request));
-  },
-  home: async ({ request }, use) => {
-    const data = await fetchCmsContent(request, "home");
-    await use(data);
-  },
-});
 
 test.describe("Public Landing Homepage E2E Spec", () => {
   // ─── Hero Section ────────────────────────────────────────────────────────────
 
-  test("[Test_01] should render the hero section using CMS copy and verify CTAs scroll correctly", async ({ page, homePage, home }) => {
+  test("[Test_01] should render the hero section using CMS copy and verify CTAs scroll correctly", async ({ page, homePage, homeCms }) => {
     const { hero } = homePage;
 
     // Badge / trust signal
-    await expect(hero.getBadgeText(home.hero.badge)).toBeVisible();
+    await expect(hero.getBadgeText(homeCms.hero.badge)).toBeVisible();
 
     // Heading prefix
-    await expect(hero.getTitleText(home.hero.titlePrefix)).toBeVisible();
+    await expect(hero.getTitleText(homeCms.hero.titlePrefix)).toBeVisible();
 
     // Paragraph body
     await expect(hero.description).toBeVisible();
 
     // Services CTA
-    const servicesCta = hero.getServicesCta(home.hero.ctaServices);
+    const servicesCta = hero.getServicesCta(homeCms.hero.ctaServices);
     await expect(servicesCta).toBeVisible();
 
     // Hire CTA — click should anchor to #contact and focus
-    const hireCta = hero.getHireCta(home.hero.ctaHire);
+    const hireCta = hero.getHireCta(homeCms.hero.ctaHire);
     await expect(hireCta).toBeVisible();
     await hireCta.click();
     await expect(hireCta).toBeFocused();
@@ -49,22 +34,22 @@ test.describe("Public Landing Homepage E2E Spec", () => {
     expect(scrollYBefore).toBeGreaterThan(0);
 
     // URL hash must reflect hire CTA href
-    await expect(page).toHaveURL(new RegExp(home.hero.ctaHireHref));
-    await expect(hero.getAnchorTarget(home.hero.ctaHireHref)).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(homeCms.hero.ctaHireHref));
+    await expect(hero.getAnchorTarget(homeCms.hero.ctaHireHref)).toBeVisible();
 
     // Services CTA should scroll to #services
     await servicesCta.scrollIntoViewIfNeeded();
     await servicesCta.click();
     const scrollYAfter = await page.evaluate(() => window.scrollY);
     expect(scrollYAfter).toBeGreaterThan(0);
-    await expect(page).toHaveURL(new RegExp(home.hero.ctaServicesHref));
+    await expect(page).toHaveURL(new RegExp(homeCms.hero.ctaServicesHref));
   });
 
   // ─── Stats / Metrics Grid ────────────────────────────────────────────────────
 
-  test("[Test_02] should render the stats grid with CMS values and labels", async ({ homePage, home }) => {
+  test("[Test_02] should render the stats grid with CMS values and labels", async ({ homePage, homeCms }) => {
     const { stats } = homePage;
-    for (const item of home.stats.items) {
+    for (const item of homeCms.stats.items) {
       await expect(stats.getStatValue(item.value)).toBeVisible();
       await expect(stats.getStatLabel(item.label)).toBeVisible();
     }
@@ -72,19 +57,19 @@ test.describe("Public Landing Homepage E2E Spec", () => {
 
   // ─── About / Mission Section ──────────────────────────────────────────────────
 
-  test("[Test_03] should verify the mission section title, description, and all feature cards are visible", async ({ homePage, home }) => {
+  test("[Test_03] should verify the mission section title, description, and all feature cards are visible", async ({ homePage, homeCms }) => {
     const { about } = homePage;
 
     // Section image
     await expect(about.image).toBeVisible();
 
     // Section heading and description paragraph
-    await expect(about.getTitle(home.about.title)).toBeVisible();
-    await expect(about.getDescription(home.about.description)).toBeVisible();
+    await expect(about.getTitle(homeCms.about.title)).toBeVisible();
+    await expect(about.getDescription(homeCms.about.description)).toBeVisible();
 
     // Each feature card: heading, paragraph, and icon
-    for (let i = 0; i < home.about.features.length; i++) {
-      const feature = home.about.features[i];
+    for (let i = 0; i < homeCms.about.features.length; i++) {
+      const feature = homeCms.about.features[i];
       await expect(about.getFeatureTitle(i)).toContainText(feature.title);
       await expect(about.getFeatureDescription(i)).toContainText(feature.description);
       await expect(about.getFeatureSvg(i)).toBeVisible();
@@ -93,8 +78,8 @@ test.describe("Public Landing Homepage E2E Spec", () => {
 
   // ─── Services Grid ───────────────────────────────────────────────────────────
 
-  test("[Test_04] should verify the services section heading and all service cards match CMS data", async ({ homePage, home }) => {
-    const { services } = home;
+  test("[Test_04] should verify the services section heading and all service cards match CMS data", async ({ homePage, homeCms }) => {
+    const { services } = homeCms;
     const { services: servicesSection } = homePage;
 
     // Section heading
@@ -126,8 +111,8 @@ test.describe("Public Landing Homepage E2E Spec", () => {
 
   // ─── Contact / Consultation Form ─────────────────────────────────────────────
 
-  test("[Test_05] should validate form constraints and successfully dispatch a care consultation", async ({ page, homePage, home }) => {
-    const { form } = home.contact;
+  test("[Test_05] should validate form constraints and successfully dispatch a care consultation", async ({ page, homePage, homeCms }) => {
+    const { form } = homeCms.contact;
     const inputData = homeData.consultationForm.desktop;
     const { contact: contactSection } = homePage;
 
@@ -168,8 +153,8 @@ test.describe("Public Landing Homepage E2E Spec", () => {
 
   // ─── Contact Section Info ─────────────────────────────────────────────────────
 
-  test("[Test_06] should render the contact section title, description, and contact info from CMS", async ({ homePage, home }) => {
-    const { contact } = home;
+  test("[Test_06] should render the contact section title, description, and contact info from CMS", async ({ homePage, homeCms }) => {
+    const { contact } = homeCms;
     const { contact: contactSection } = homePage;
 
     await expect(contactSection.getTitle(contact.title)).toBeVisible();

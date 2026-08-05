@@ -1,28 +1,13 @@
-import { test as base, expect } from "@playwright/test";
-import { setupCmsPage, fetchCmsContent, CmsContent, getPartnersData } from "../helpers.js";
-import { PartnersPage } from "../pom/PartnersPage.js";
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
+import { getPartnersData } from "../helpers.js";
 
 const partnersData = getPartnersData();
-
-const test = base.extend<{
-  partnersPage: PartnersPage;
-  corp: CmsContent;
-}>({
-  partnersPage: async ({ page, request }, use) => {
-    await setupCmsPage(page, request, "corporate", "/partners");
-    await use(new PartnersPage(page, request));
-  },
-  corp: async ({ request }, use) => {
-    const data = await fetchCmsContent(request, "corporate");
-    await use(data);
-  },
-});
 
 test.describe("Corporate Partnerships Spec", () => {
   // ─── Hero Section ─────────────────────────────────────────────────────────────
 
-  test("[Test_01] should render the corporate branding hero and navigation triggers", async ({ partnersPage, corp }) => {
-    const { navigation, hero } = corp;
+  test("[Test_01] should render the corporate branding hero and navigation triggers", async ({ partnersPage, corporateCms }) => {
+    const { navigation, hero } = corporateCms;
     const { hero: heroSection } = partnersPage;
 
     // Navigation badge
@@ -50,16 +35,16 @@ test.describe("Corporate Partnerships Spec", () => {
 
   // ─── How It Works ─────────────────────────────────────────────────────────────
 
-  test("[Test_02] should render the how-it-works section title and contact link", async ({ partnersPage, corp }) => {
-    const { howItWorks } = corp;
+  test("[Test_02] should render the how-it-works section title and contact link", async ({ partnersPage, corporateCms }) => {
+    const { howItWorks } = corporateCms;
     await expect(partnersPage.howItWorks.getTitle(howItWorks.title)).toBeVisible();
     await expect(partnersPage.howItWorks.getLink(howItWorks.link.text)).toBeVisible();
   });
 
   // ─── Features / Bento Grid ────────────────────────────────────────────────────
 
-  test("[Test_03] should verify on-demand certified professionals benefits bento layout", async ({ page, partnersPage, corp }) => {
-    const { features } = corp;
+  test("[Test_03] should verify on-demand certified professionals benefits bento layout", async ({ page, partnersPage, corporateCms }) => {
+    const { features } = corporateCms;
     const { features: featuresSection } = partnersPage;
 
     // Section heading
@@ -97,8 +82,8 @@ test.describe("Corporate Partnerships Spec", () => {
 
   // ─── ROI Calculator ───────────────────────────────────────────────────────────
 
-  test("[Test_04] should calculate correct ROI estimates inside the interactive savings widget", async ({ partnersPage, corp }) => {
-    const { calculator } = corp;
+  test("[Test_04] should calculate correct ROI estimates inside the interactive savings widget", async ({ partnersPage, corporateCms }) => {
+    const { calculator } = corporateCms;
     const { calculator: calcSection } = partnersPage;
 
     // Section headings
@@ -135,8 +120,8 @@ test.describe("Corporate Partnerships Spec", () => {
 
   // ─── Testimonial ──────────────────────────────────────────────────────────────
 
-  test("[Test_05] should render the testimonial quote, author, and role from CMS", async ({ partnersPage, corp }) => {
-    const { testimonial } = corp;
+  test("[Test_05] should render the testimonial quote, author, and role from CMS", async ({ partnersPage, corporateCms }) => {
+    const { testimonial } = corporateCms;
     await expect(partnersPage.testimonial.getQuote(testimonial.quote)).toBeVisible();
     await expect(partnersPage.testimonial.getAuthor(testimonial.author)).toBeVisible();
     await expect(partnersPage.testimonial.getRole(testimonial.role)).toBeVisible();
@@ -144,15 +129,15 @@ test.describe("Corporate Partnerships Spec", () => {
 
   // ─── Partnership Inquiry Form ─────────────────────────────────────────────────
 
-  test("[Test_06] should render the inquiry section title, description, and footer note", async ({ partnersPage, corp }) => {
-    const { inquiry } = corp;
+  test("[Test_06] should render the inquiry section title, description, and footer note", async ({ partnersPage, corporateCms }) => {
+    const { inquiry } = corporateCms;
     await expect(partnersPage.inquiry.getTitle(inquiry.title)).toBeVisible();
     await expect(partnersPage.inquiry.getDescription(inquiry.description)).toBeVisible();
     await expect(partnersPage.inquiry.getFooterNote(inquiry.footer)).toBeVisible();
   });
 
-  test("[Test_07] should dispatch corporate partnership intake inquiries successfully", async ({ page, partnersPage, corp }) => {
-    const { inquiry } = corp;
+  test("[Test_07] should dispatch corporate partnership intake inquiries successfully", async ({ page, partnersPage, corporateCms }) => {
+    const { inquiry } = corporateCms;
     const { inquiry: inquirySection } = partnersPage;
     const inputData = partnersData.inquiryForm.desktop;
 
@@ -181,8 +166,8 @@ test.describe("Corporate Partnerships Spec", () => {
 
   // ─── Contact Info ─────────────────────────────────────────────────────────────
 
-  test("[Test_08] should render the contact address, email, and phone from CMS", async ({ partnersPage, corp }) => {
-    const { contact } = corp;
+  test("[Test_08] should render the contact address, email, and phone from CMS", async ({ partnersPage, corporateCms }) => {
+    const { contact } = corporateCms;
     await expect(partnersPage.contact.getContactDetail(contact.address)).toBeVisible();
     await expect(partnersPage.contact.getContactDetail(contact.email)).toBeVisible();
     await expect(partnersPage.contact.getContactDetail(contact.phone)).toBeVisible();

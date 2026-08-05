@@ -1,6 +1,6 @@
 # Playwright Test Automation Framework
 
-Comprehensive E2E and API test automation suite built with [Playwright](https://playwright.dev/) and TypeScript, implementing the Page Object Model (POM) design pattern, multi-viewport responsive testing, and CI/CD automated pipeline execution.
+Comprehensive E2E and API test automation suite built with [Playwright](https://playwright.dev/) and TypeScript, implementing the Page Object Model (POM) design pattern with custom Fixtures injection, multi-viewport responsive testing, and CI/CD automated pipeline execution.
 
 ---
 
@@ -8,6 +8,10 @@ Comprehensive E2E and API test automation suite built with [Playwright](https://
 
 - [📁 Directory Structure & Directory Guide](#-directory-structure--directory-guide)
 - [🏗️ Architecture & Design Pattern](#️-architecture--design-pattern)
+  - [Fixture-Based Page Object Model (POM) Injection](#fixture-based-page-object-model-pom-injection)
+  - [Efficiency & Maintenance Benefits of POM Fixtures](#efficiency--maintenance-benefits-of-pom-fixtures)
+  - [Fixture Data Management & Separation (`/fixtures/`)](#fixture-data-management--separation-fixtures)
+  - [Dynamic Payload Generation (`@faker-js/faker`)](#dynamic-payload-generation-faker-jsfaker)
   - [Dynamic CMS Content Integration (`fetchCmsContent`)](#dynamic-cms-content-integration-fetchcmscontent)
 - [🧪 Test Coverage](#-test-coverage)
   - [1. Global Navigation (`tests/global/`)](#1-global-navigation-testsglobal)
@@ -25,53 +29,90 @@ Comprehensive E2E and API test automation suite built with [Playwright](https://
 playwright-test-automation/
 ├── .github/
 │   └── workflows/
-│       └── playwright.yml        # GitHub Actions CI workflow definition
-├── fixtures/                     # Static & template JSON test payload fixtures
-│   ├── adminData.json            # Admin employee & shift test templates
-│   ├── authData.json             # Invalid user & rate limit payload test data
-│   ├── homeData.json             # Homepage static content fallbacks
-│   ├── partnersData.json         # Corporate partnership static content fallbacks
-│   └── portalData.json           # Caregiver portal & leave request test templates
+│       └── playwright.yml          # GitHub Actions CI workflow definition
+├── fixtures/                       # Fixtures & static JSON test payload data
+│   ├── pages/                      # Individual Page Object Fixture modules
+│   │   ├── admin-portal-page.fixture.ts    # Authenticated Admin Portal page fixture
+│   │   ├── employee-portal-page.fixture.ts # Authenticated Caregiver Portal page fixture
+│   │   ├── home-page.fixture.ts            # Homepage fixture with CMS setup
+│   │   ├── login-page.fixture.ts           # Login page fixture
+│   │   ├── partners-page.fixture.ts        # Partnerships page fixture with CMS setup
+│   │   └── privacy-page.fixture.ts         # Privacy Policy page fixture
+│   ├── cms.fixture.ts              # CMS data fixtures (navCms, homeCms, corporateCms, footerCms)
+│   ├── page-objects.fixture.ts     # Master merged fixture uniting all POM & CMS fixtures
+│   ├── adminData.json              # Admin employee & shift test templates
+│   ├── authData.json               # Invalid user & rate limit payload test data
+│   ├── homeData.json               # Homepage static content fallbacks
+│   ├── partnersData.json           # Corporate partnership static content fallbacks
+│   └── portalData.json             # Caregiver portal & leave request test templates
 ├── tests/
-│   ├── api/                      # Backend API contract, schema & integration specs
-│   │   ├── admin/                # Admin user management & scheduling API specs
-│   │   ├── auth/                 # Authentication, login & session API specs
-│   │   ├── cms/                  # Content Delivery API & AJV contract/schema specs
-│   │   ├── portal/               # Caregiver shift & operational portal API specs
-│   │   └── submissions/          # Consultation & partnership form submission API specs
-│   ├── global/                   # Cross-page global layout component specs
-│   │   ├── footer.spec.ts        # Footer link rendering, copyright & privacy routing
-│   │   └── navbar.spec.ts        # Header navigation, brand logo & page routing
-│   ├── pages/                    # Multi-viewport UI & E2E page specs
-│   │   ├── admin-portal.spec.ts  # Admin dashboard & scheduling E2E specs
+│   ├── api/                        # Backend API contract, schema & integration specs
+│   │   ├── admin/                  # Admin user management & scheduling API specs
+│   │   ├── auth/                   # Authentication, login & session API specs
+│   │   ├── cms/                    # Content Delivery API & AJV contract/schema specs
+│   │   ├── portal/                 # Caregiver shift & operational portal API specs
+│   │   └── submissions/            # Consultation & partnership form submission API specs
+│   ├── global/                     # Cross-page global layout component specs
+│   │   ├── footer.spec.ts          # Footer link rendering, copyright & privacy routing
+│   │   └── navbar.spec.ts          # Header navigation, brand logo & page routing
+│   ├── pages/                      # Multi-viewport UI & E2E page specs
+│   │   ├── admin-portal.spec.ts    # Admin dashboard & scheduling E2E specs
 │   │   ├── employee-portal.spec.ts # Caregiver shift portal E2E specs
-│   │   ├── homepage*.spec.ts     # Homepage specs (Desktop, Tablet, Mobile)
-│   │   ├── login.spec.ts         # Login forms & IT support modal specs
-│   │   └── partners*.spec.ts     # Partnership landing specs (Desktop, Tablet, Mobile)
-│   ├── pom/                      # Page Object Model (POM) element locators & actions
-│   │   ├── components/           # Reusable UI component models (Navbar, Footer)
-│   │   ├── AdminPortalPage.ts    # Admin portal page object
-│   │   ├── BasePage.ts           # Shared base page object with common utilities
-│   │   ├── EmployeePortalPage.ts # Employee portal page object
-│   │   ├── HomePage.ts           # Landing homepage page object
-│   │   ├── LoginPage.ts          # Login page object
-│   │   ├── PartnersPage.ts       # Partnerships page object
-│   │   └── PrivacyPage.ts        # Static privacy policy page object
-│   └── helpers.ts                # Shared test fixtures, CMS data fetchers & auth helpers
-├── .env.test                     # Primary environment variables configuration
-├── .env.tests                    # Secondary/CI environment variables configuration
-├── playwright.config.ts          # Central Playwright configuration file
-└── README.md                     # Framework documentation & execution guide
+│   │   ├── homepage*.spec.ts       # Homepage specs (Desktop, Tablet, Mobile)
+│   │   ├── login.spec.ts           # Login forms & IT support modal specs
+│   │   └── partners*.spec.ts       # Partnership landing specs (Desktop, Tablet, Mobile)
+│   ├── pom/                        # Page Object Model (POM) element locators & actions
+│   │   ├── components/             # Reusable UI component models (Navbar, Footer)
+│   │   ├── AdminPortalPage.ts      # Admin portal page object
+│   │   ├── BasePage.ts             # Shared base page object with common utilities
+│   │   ├── EmployeePortalPage.ts   # Employee portal page object
+│   │   ├── HomePage.ts             # Landing homepage page object
+│   │   ├── LoginPage.ts            # Login page object
+│   │   ├── PartnersPage.ts         # Partnerships page object
+│   │   └── PrivacyPage.ts          # Static privacy policy page object
+│   └── helpers.ts                  # Shared test fixtures, CMS data fetchers & auth helpers
+├── .env.test                       # Primary environment variables configuration
+├── .env.tests                      # Secondary/CI environment variables configuration
+├── playwright.config.ts            # Central Playwright configuration file
+└── README.md                       # Framework documentation & execution guide
 ```
 
 ---
 
 ## 🏗️ Architecture & Design Pattern
 
-The repository follows a clean **Page Object Model (POM)** architecture:
+The repository implements an advanced **Fixture-Based Page Object Model (POM)** architecture:
 
-- **`tests/pom/`**: Encapsulates page elements and methods (`HomePage.ts`, `PartnersPage.ts`, `LoginPage.ts`, `AdminPortalPage.ts`, `EmployeePortalPage.ts`, `PrivacyPage.ts`).
+- **`tests/pom/`**: Encapsulates page element locators, section component handlers, and domain actions (`HomePage.ts`, `PartnersPage.ts`, `LoginPage.ts`, `AdminPortalPage.ts`, `EmployeePortalPage.ts`, `PrivacyPage.ts`).
 - **`tests/pom/components/`**: Reusable navigation & footer component models (`Navbar.ts`, `Footer.ts`).
+- **`fixtures/`**: Page-level fixture extensions (`fixtures/pages/*`) combined via `mergeTests` into a single central entry point (`/fixtures/page-objects.fixture.ts`).
+
+### Fixture-Based Page Object Model (POM) Injection
+
+Instead of manually instantiating page classes inside every test or relying on repetitive `beforeEach` / `beforeAll` hooks, page objects are injected directly into test parameter signatures as Playwright fixtures:
+
+```ts
+// Example: Using injected page objects and CMS fixtures
+import { test, expect } from "../../fixtures/page-objects.fixture.js";
+
+test("[Test_01] should render the hero section using CMS copy", async ({ homePage, homeCms }) => {
+  await expect(homePage.hero.getBadgeText(homeCms.hero.badge)).toBeVisible();
+});
+
+test("[Test_01] should support staff registry auditing", async ({ adminPortalPage }) => {
+  await adminPortalPage.registry.registryTab.click();
+  await expect(adminPortalPage.registry.getEmployeeName("Elena Rodriguez")).toBeVisible();
+});
+```
+
+### Efficiency & Maintenance Benefits of POM Fixtures
+
+1. **Elimination of Boilerplate**: Removes manual instantiation (`new HomePage(page, request)`) and repetitive `beforeEach` setup blocks from test files.
+2. **Lazy On-Demand Initialization**: Fixtures execute **only** when requested by a test method signature. Unused fixtures are never loaded or executed, reducing memory overhead and improving test execution speed.
+3. **Encapsulated Authentication**: Authenticated page fixtures (`adminPortalPage`, `employeePortalPage`) automatically handle programmatic authentication via `.env.test` / `.env.tests` credentials prior to test execution, keeping spec files completely clean.
+4. **Modular & Scalable Architecture**: Individual page fixtures in `/fixtures/pages/` are combined using Playwright's `mergeTests` utility into `/fixtures/page-objects.fixture.ts`, enabling a clean, single-point import across all spec files.
+5. **Simplified Test Maintenance**: Updates to setup workflows, route preparation, or authentication mechanisms only require changes in the corresponding fixture file without touching any spec files.
+
 ### Fixture Data Management & Separation (`/fixtures/`)
 
 To prevent inline hardcoded test data and maintain clean spec files, static data templates and mock payload structures are stored in central JSON files within `/fixtures/`:
@@ -90,7 +131,7 @@ For realistic data generation and to prevent collision during concurrent test ru
 
 ### Dynamic CMS Content Integration (`fetchCmsContent`)
 
-Rather than asserting against hardcoded static strings, tests dynamically retrieve page copy, navigation links, and section configurations directly from the CMS Content Delivery API using `fetchCmsContent` in [`tests/helpers.ts`](file:///Users/vimay/playwright-test-automation/tests/helpers.ts#L84-L95):
+Rather than asserting against hardcoded static strings, tests dynamically retrieve page copy, navigation links, and section configurations directly from the CMS Content Delivery API using `cms.fixture.ts` and `fetchCmsContent` in [`tests/helpers.ts`](file:///Users/vimay/playwright-test-automation/tests/helpers.ts#L84-L95):
 
 ```ts
 export async function fetchCmsContent(request: APIRequestContext, pageId: string): Promise<CmsContent> {
@@ -107,8 +148,6 @@ export async function fetchCmsContent(request: APIRequestContext, pageId: string
 }
 ```
 
-This helper is invoked in fixture extensions and `beforeEach` setup calls (`setupCmsPage`) so that UI assertions automatically validate against the latest CMS data.
-
 Every test across all spec files is tagged with a standardized ID prefix (`[Test_01]`, `[Test_02]`, etc.) for test reporting and traceability.
 
 ---
@@ -116,15 +155,15 @@ Every test across all spec files is tagged with a standardized ID prefix (`[Test
 ## 🧪 Test Coverage
 
 ### 1. Global Navigation (`tests/global/`)
-- `navbar.spec.ts` (`[Test_01]` – `[Test_07]`): Desktop & mobile drawer navigation, brand logo links, portal routing.
-- `footer.spec.ts` (`[Test_01]` – `[Test_10]`): Dynamic CMS link rendering, privacy policy routing, copyright notice.
+- `navbar.spec.ts` (`[Test_01]` – `[Test_07]`): Desktop & mobile drawer navigation, brand logo links, portal routing using `homePage`, `partnersPage`, `loginPage`, `privacyPage`, and `navCms` fixtures.
+- `footer.spec.ts` (`[Test_01]` – `[Test_10]`): Dynamic CMS link rendering, privacy policy routing, copyright notice using `homePage` and `footerCms` fixtures.
 
 ### 2. Page-Level E2E (`tests/pages/`)
-- `homepage*.spec.ts` (`[Test_01]` – `[Test_06]`): Desktop, Tablet (`768x1024`), and Mobile (`375x812`) viewport layouts, hero CTAs, service cards, contact forms.
-- `partners*.spec.ts` (`[Test_01]` – `[Test_08]`): Desktop, Tablet, and Mobile viewport layouts, corporate intake forms, interactive ROI calculators, testimonial carousels.
-- `admin-portal.spec.ts` (`[Test_01]` – `[Test_04]`): Admin login, dashboard navigation, user role management, system metrics view.
-- `employee-portal.spec.ts` (`[Test_01]` – `[Test_04]`): Staff schedule view, patient assignment lists, shift check-in/out.
-- `login.spec.ts` (`[Test_01]` – `[Test_04]`): Login forms, password reset dialogs, IT support request slide-down form.
+- `homepage*.spec.ts` (`[Test_01]` – `[Test_06]`): Desktop, Tablet (`768x1024`), and Mobile (`375x812`) viewport layouts, hero CTAs, service cards, contact forms using `homePage` and `homeCms` fixtures.
+- `partners*.spec.ts` (`[Test_01]` – `[Test_08]`): Desktop, Tablet, and Mobile viewport layouts, corporate intake forms, interactive ROI calculators, testimonial carousels using `partnersPage` and `corporateCms` fixtures.
+- `admin-portal.spec.ts` (`[Test_01]` – `[Test_04]`): Admin login, dashboard navigation, user role management, system metrics view using `adminPortalPage` fixture.
+- `employee-portal.spec.ts` (`[Test_01]` – `[Test_04]`): Staff schedule view, patient assignment lists, shift check-in/out using `employeePortalPage` fixture.
+- `login.spec.ts` (`[Test_01]` – `[Test_04]`): Login forms, password reset dialogs, IT support request slide-down form using `loginPage` fixture.
 
 ### 3. API Testing (`tests/api/`)
 - `api/cms/` (`[Test_01]` – `[Test_22]`): CMS Content Delivery API payload validation (`content.spec.ts`) and AJV schema compliance with latency SLAs (`content.schema.spec.ts`).
