@@ -1,0 +1,9 @@
+node_modules/
+playwright-report/
+test-results/
+.env.tests
+.DS_Store
+*.log
+xpackage.jsonx
+xplaywright.config.tsx
+xxpackage-lock.jsonx

@@ -1,0 +1,19 @@
+{
+  "leaveRequest": {
+    "reason": "Sick",
+    "status": "Pending Approval"
+  },
+  "unauthorizedShift": {
+    "scheduleId": "some-shift-id",
+    "action": "clock_in",
+    "employeeId": "some-other-employee",
+    "employeeName": "Someone Else"
+  },
+  "unauthorizedEmployee": {
+    "id": "temp-hacker",
+    "name": "Hacker",
+    "username": "hacker@compassioncare.com",
+    "password": "password123",
+    "role": "admin"
+  }
+}

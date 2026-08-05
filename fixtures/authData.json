@@ -1,0 +1,13 @@
+{
+  "invalidUser": {
+    "email": "attacker@dangerous.com",
+    "password": "fake_password"
+  },
+  "rateLimitUser": {
+    "email": "wrong_rate_limit_test@compassioncare.com",
+    "password": "incorrect_password"
+  },
+  "requestAccessUser": {
+    "email": "newcaregiver@compassioncare.com"
+  }
+}

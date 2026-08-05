@@ -1,0 +1,27 @@
+{
+  "testEmployee": {
+    "name": "Automation Tester",
+    "password": "securetestpwd123",
+    "role": "employee",
+    "status": "active"
+  },
+  "mockShift": {
+    "clientName": "Arthur Miller",
+    "time": "08:00 - 16:00",
+    "location": "Oakwood Estates",
+    "status": "upcoming",
+    "dateKey": "MON",
+    "shiftType": "Day",
+    "notes": "Ensure morning meds are taken",
+    "month": "July",
+    "year": 2026,
+    "date": "2026-07-27",
+    "dateLabel": "MON 27"
+  },
+  "mockLeave": {
+    "startDate": "2026-07-28",
+    "endDate": "2026-07-30",
+    "reason": "Sick",
+    "status": "Pending Approval"
+  }
+}

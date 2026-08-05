@@ -1,0 +1,91 @@
+import { test, expect } from "@playwright/test";
+import { setupCmsPage, CmsContent, getPartnersData } from "../helpers.js";
+import { PartnersPage } from "../pom/PartnersPage.js";
+
+test.describe("Corporate Partnerships Tablet Viewport Spec (768x1024)", () => {
+  let corp: CmsContent;
+  let partnersPage: PartnersPage;
+  const partnersData = getPartnersData();
+
+  test.beforeEach(async ({ page, request }) => {
+    partnersPage = new PartnersPage(page, request);
+    await page.setViewportSize({ width: 768, height: 1024 });
+    corp = await setupCmsPage(page, request, "corporate", "/partners");
+  });
+
+  // ─── Tablet Hero Section ──────────────────────────────────────────────────────
+
+  test("[Test_01] should render corporate hero section with visible branding and CTAs on tablet", async () => {
+    const { navigation, hero } = corp;
+    const { hero: heroSection } = partnersPage;
+
+    await expect(heroSection.getBadgeText(navigation.badge)).toBeVisible();
+    await expect(heroSection.title).toContainText(hero.titlePrefix);
+    await expect(heroSection.primaryCta).toHaveText(hero.cta);
+    await expect(heroSection.secondaryCta).toHaveText(hero.ctaSecondary);
+  });
+
+  // ─── Tablet Bento Grid ────────────────────────────────────────────────────────
+
+  test("[Test_02] should render bento feature cards in tablet grid layout", async () => {
+    const { features } = corp;
+    const { features: featuresSection } = partnersPage;
+
+    await expect(featuresSection.title).toContainText(features.absoluteReliability.title);
+
+    // Card 0
+    await expect(featuresSection.getCardTitle(0)).toHaveText(features.onDemandStaffing.title);
+    await expect(featuresSection.getCardFirstHighlight(0)).toBeVisible();
+
+    // Card 1
+    await expect(featuresSection.getCardTitle(1)).toHaveText(features.certifiedProfessionals.title);
+    await expect(featuresSection.getCardFirstListItem(1)).toBeVisible();
+
+    // Card 2
+    await expect(featuresSection.getCardTitle(2)).toHaveText(features.easyManagement.title);
+  });
+
+  // ─── Tablet ROI Calculator ────────────────────────────────────────────────────
+
+  test("[Test_03] should allow slider interaction and display ROI impact on tablet screens", async () => {
+    const { calculator } = corp;
+    const { calculator: calcSection } = partnersPage;
+
+    await expect(calcSection.getTitle(calculator.title)).toBeVisible();
+    await expect(calcSection.residentCountSlider).toBeVisible();
+    await expect(calcSection.weeklyShiftsSlider).toBeVisible();
+    await expect(calcSection.getCareLevelButton(calculator.labels.careLevels[0])).toBeVisible();
+
+    await expect(calcSection.getImpactValue("$896")).toBeVisible();
+    await expect(calcSection.getImpactValue("$1,210")).toBeVisible();
+    await expect(calcSection.getImpactValue("$16,328")).toBeVisible();
+  });
+
+  // ─── Tablet Inquiry Form ──────────────────────────────────────────────────────
+
+  test("[Test_04] should submit corporate partnership inquiry on tablet screen", async ({ page }) => {
+    const { inquiry } = corp;
+    const { inquiry: inquirySection } = partnersPage;
+    const inputData = partnersData.inquiryForm.tablet;
+
+    await page.route("**/api/partnership", async (route) => {
+      await route.fulfill({ status: 200, json: { success: true } });
+    });
+
+    const apiResponsePromise = page.waitForResponse("**/api/partnership");
+
+    await inquirySection.fillInquiry({
+      name: inputData.name,
+      email: inputData.email,
+      orgType: inputData.orgType,
+      needs: inputData.needs
+    });
+
+    await inquirySection.getSubmitButton(inquiry.cta).click();
+
+    const apiResponse = await apiResponsePromise;
+    expect(apiResponse.status()).toBe(200);
+
+    await expect(inquirySection.successTitle).toBeVisible();
+  });
+});

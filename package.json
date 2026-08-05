@@ -1,0 +1,42 @@
+{
+  "name": "playwright-test-automation",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CompassionCare Playwright Test Automation Suite",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "start": "node dist/server.cjs",
+    "test": "npx playwright test",
+    "test:cli": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.5.0",
+    "@playwright/test": "^1.62.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.14.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "ajv": "^8.20.0",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.0.5",
+    "clsx": "^2.1.1",
+    "cookie-parser": "^1.4.7",
+    "esbuild": "^0.28.1",
+    "express": "^5.2.1",
+    "lucide-react": "^1.28.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.5",
+    "vite": "^8.2.0"
+  }
+}
