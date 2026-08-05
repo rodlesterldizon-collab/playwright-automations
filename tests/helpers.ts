@@ -43,13 +43,13 @@ export function getPortalData() {
  * Shared credentials helper reading from environment variables
  */
 export function getAdminCredentials() {
-  const email = process.env.ADMIN_EMAIL || "admin@example.com";
+  const email = process.env.ADMIN_EMAIL || "dizonrl20@gmail.com";
   const password = process.env.ADMIN_PASSWORD || "admin";
   return { email, password };
 }
 
 export function getCaregiverCredentials() {
-  const email = process.env.EMPLOYEE_EMAIL || "employee@example.com";
+  const email = process.env.EMPLOYEE_EMAIL || "wena@wen.ca";
   const password = process.env.EMPLOYEE_PASSWORD || "admin";
   return { email, password };
 }
@@ -145,7 +145,8 @@ export async function setupCmsPage(page: Page, request: APIRequestContext, pageI
 export async function loginProgrammatic(context: BrowserContext, request: APIRequestContext, email: string, loginPass: string): Promise<void> {
   const baseUrl = process.env.PLAYWRIGHT_baseUrl || process.env.PLAYWRIGHT_BASE_URL || "https://compassion-care.ai.studio/";
 
-  const response = await request.post(`${baseUrl}api/auth/login`, {
+  const reqContext = context ? context.request : request;
+  const response = await reqContext.post(`${baseUrl}api/auth/login`, {
     data: { email, password: loginPass },
     headers: { "Content-Type": "application/json" }
   });
@@ -159,6 +160,21 @@ export async function loginProgrammatic(context: BrowserContext, request: APIReq
     throw new Error(`Programmatic login rejected: ${JSON.stringify(body)}`);
   }
 
-  // Ensure cookies from request context are transfered/accessible in page context.
-  // Playwright automatically shares cookie state if request context is context.request!
+  // Transfer cookie to browser context if header is present
+  const setCookieHeader = response.headers()["set-cookie"];
+  if (setCookieHeader && context) {
+    const match = setCookieHeader.match(/CC_SESSION=([^;]+)/);
+    if (match && match[1]) {
+      const urlObj = new URL(baseUrl);
+      await context.addCookies([{
+        name: "CC_SESSION",
+        value: match[1],
+        domain: urlObj.hostname,
+        path: "/",
+        httpOnly: true,
+        secure: urlObj.protocol === "https:",
+        sameSite: "Lax"
+      }]);
+    }
+  }
 }
