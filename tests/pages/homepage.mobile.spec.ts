@@ -4,11 +4,6 @@ import { getHomeData } from "../helpers.js";
 test.describe("Public Landing Homepage Mobile Viewport Spec (375x812)", () => {
   const homeData = getHomeData();
 
-  test.beforeEach(async ({ page }) => {
-    // Set viewport to iPhone X size
-    await page.setViewportSize({ width: 375, height: 812 });
-  });
-
   // ─── Mobile Hero Section ──────────────────────────────────────────────────────
 
   test("[Test_01] should render mobile hero section with visible branding and CTAs", async ({ homePage, homeCms }) => {

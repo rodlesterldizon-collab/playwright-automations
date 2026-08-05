@@ -29,7 +29,24 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testIgnore: ["**/*.mobile.spec.ts", "**/*.tablet.spec.ts"],
       use: { ...devices["Desktop Chrome"] },
-    }
+    },
+    {
+      name: "mobile",
+      testMatch: "**/*.mobile.spec.ts",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 375, height: 812 },
+      },
+    },
+    {
+      name: "tablet",
+      testMatch: "**/*.tablet.spec.ts",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 768, height: 1024 },
+      },
+    },
   ],
 });

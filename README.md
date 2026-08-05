@@ -166,8 +166,9 @@ Every test across all spec files is tagged with a standardized ID prefix (`[Test
 - `footer.spec.ts` (`[Test_01]` – `[Test_10]`): Dynamic CMS link rendering, privacy policy routing, copyright notice using `homePage` and `footerCms` fixtures.
 
 ### 2. Page-Level E2E (`tests/pages/`)
-- `homepage*.spec.ts` (`[Test_01]` – `[Test_06]`): Desktop, Tablet (`768x1024`), and Mobile (`375x812`) viewport layouts, hero CTAs, service cards, contact forms using `homePage` and `homeCms` fixtures.
-- `partners*.spec.ts` (`[Test_01]` – `[Test_08]`): Desktop, Tablet, and Mobile viewport layouts, corporate intake forms, interactive ROI calculators, testimonial carousels using `partnersPage` and `corporateCms` fixtures.
+- **Desktop Layouts**: `homepage.spec.ts` and `partners.spec.ts` test standard large desktop layouts.
+- **Tablet Layouts (`768x1024`)**: `homepage.tablet.spec.ts` and `partners.tablet.spec.ts` run targeting simulated tablet devices to verify layout wrapping, column shifts, and touch-friendly targets.
+- **Mobile Layouts (`375x812`)**: `homepage.mobile.spec.ts` and `partners.mobile.spec.ts` run targeting mobile phones (e.g. iPhone X size) to verify collapsed hamburger menus, stacked elements, and compressed CTAs.
 - `admin-portal.spec.ts` (`[Test_01]` – `[Test_04]`): Admin login, dashboard navigation, user role management, system metrics view using `adminPortalPage` fixture.
 - `employee-portal.spec.ts` (`[Test_01]` – `[Test_04]`): Staff schedule view, patient assignment lists, shift check-in/out using `employeePortalPage` fixture.
 - `login.spec.ts` (`[Test_01]` – `[Test_04]`): Login forms, password reset dialogs, IT support request slide-down form using `loginPage` fixture.
@@ -178,6 +179,18 @@ Every test across all spec files is tagged with a standardized ID prefix (`[Test
 - `api/admin/` (`[Test_01]` – `[Test_03]`): Admin user management endpoints, metrics calculation APIs, system health checks (`admin.spec.ts`).
 - `api/portal/` (`[Test_01]` – `[Test_08]`): Shift management endpoints, patient profile lookup, caregiver task updates (`portal.spec.ts`).
 - `api/submissions/` (`[Test_01]` – `[Test_06]`): Public consultation requests and corporate inquiry form API endpoints (`form-submission.spec.ts`).
+
+---
+
+## 📱 Viewport Compatibility Testing System
+
+To guarantee absolute consistency and prevent state pollution, viewport-specific tests are decoupled from manual inline viewport overrides (`page.setViewportSize`) and managed dynamically through native **Playwright Projects** in `playwright.config.ts`:
+
+1. **`chromium` (Desktop)**: Runs general pages with default high-resolution viewport settings while ignoring viewport-specific specs (`testIgnore: ["**/*.mobile.spec.ts", "**/*.tablet.spec.ts"]`).
+2. **`tablet` (Tablet)**: Matches `**/*.tablet.spec.ts` and overrides the default viewport size to `768x1024` with standard chromium rendering.
+3. **`mobile` (Mobile)**: Matches `**/*.mobile.spec.ts` and overrides the default viewport size to `375x812` with standard chromium rendering.
+
+This clean separation ensures high execution speed, parallelizability, and isolated environment capabilities.
 
 ---
 
@@ -202,6 +215,9 @@ Run test suites targeted by specific directories or layers:
 | :--- | :--- | :--- |
 | **All Tests** | `npx playwright test` | Run entire E2E and API test suite |
 | **UI Mode** | `npx playwright test --ui` | Open interactive Playwright UI runner |
+| **Mobile Tests** | `npx playwright test --project=mobile` | Run all mobile viewport UI page specs (`375x812`) |
+| **Tablet Tests** | `npx playwright test --project=tablet` | Run all tablet viewport UI page specs (`768x1024`) |
+| **Desktop Tests** | `npx playwright test --project=chromium` | Run all standard desktop E2E UI page specs |
 | **Global Components** | `npx playwright test tests/global/` | Run Navbar & Footer component specs |
 | **Page E2E Tests** | `npx playwright test tests/pages/` | Run all desktop, tablet, and mobile UI page specs |
 | **API Test Suite** | `npx playwright test tests/api/` | Run all backend API test directories |

@@ -4,10 +4,6 @@ import { getPartnersData } from "../helpers.js";
 test.describe("Corporate Partnerships Tablet Viewport Spec (768x1024)", () => {
   const partnersData = getPartnersData();
 
-  test.beforeEach(async ({ page }) => {
-    await page.setViewportSize({ width: 768, height: 1024 });
-  });
-
   // ─── Tablet Hero Section ──────────────────────────────────────────────────────
 
   test("[Test_01] should render corporate hero section with visible branding and CTAs on tablet", async ({ partnersPage, corporateCms }) => {

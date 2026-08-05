@@ -4,10 +4,6 @@ import { getPartnersData } from "../helpers.js";
 test.describe("Corporate Partnerships Mobile Viewport Spec (375x812)", () => {
   const partnersData = getPartnersData();
 
-  test.beforeEach(async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-  });
-
   // ─── Mobile Hero Section ──────────────────────────────────────────────────────
 
   test("[Test_01] should render corporate hero section with visible branding and CTAs on mobile", async ({ partnersPage, corporateCms }) => {

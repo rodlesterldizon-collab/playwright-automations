@@ -4,11 +4,6 @@ import { getHomeData } from "../helpers.js";
 test.describe("Public Landing Homepage Tablet Viewport Spec (768x1024)", () => {
   const homeData = getHomeData();
 
-  test.beforeEach(async ({ page }) => {
-    // Set viewport to iPad 2 size
-    await page.setViewportSize({ width: 768, height: 1024 });
-  });
-
   // ─── Tablet Hero Section ──────────────────────────────────────────────────────
 
   test("[Test_01] should render tablet hero section with visible branding and CTAs", async ({ homePage, homeCms }) => {
