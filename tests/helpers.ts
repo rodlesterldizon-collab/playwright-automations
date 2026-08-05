@@ -43,14 +43,14 @@ export function getPortalData() {
  * Shared credentials helper reading from environment variables
  */
 export function getAdminCredentials() {
-  const email = process.env.ADMIN_EMAIL || "dizonrl20@gmail.com";
-  const password = process.env.ADMIN_PASSWORD || "admin";
+  const email = process.env.ADMIN_EMAIL || "";
+  const password = process.env.ADMIN_PASSWORD || "";
   return { email, password };
 }
 
 export function getCaregiverCredentials() {
-  const email = process.env.EMPLOYEE_EMAIL || "wena@wen.ca";
-  const password = process.env.EMPLOYEE_PASSWORD || "admin";
+  const email = process.env.EMPLOYEE_EMAIL || "";
+  const password = process.env.EMPLOYEE_PASSWORD || "";
   return { email, password };
 }
 
@@ -112,8 +112,8 @@ export function formatDateToLabel(dateString: string): string {
  */
 export async function fetchCmsContent(request: APIRequestContext, pageId: string): Promise<CmsContent> {
   const apiBase = process.env.CONTENT_API_BASE_URL || "https://compassion-care.ai.studio/api/content";
-  const spaceId = process.env.SPACE_ID || "ccspace_8a39b2";
-  const token = process.env.ACCESS_TOKEN || "cc_cda_token_9e4f21";
+  const spaceId = process.env.SPACE_ID || "";
+  const token = process.env.ACCESS_TOKEN || "";
 
   const response = await request.get(`${apiBase}/${spaceId}/${pageId}?access_token=${token}`);
   if (!response.ok()) {
