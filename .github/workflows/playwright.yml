@@ -34,14 +34,14 @@ jobs:
     - name: Run Playwright Test Suite
       run: npx playwright test
       env:
-        PLAYWRIGHT_baseUrl: ${{ secrets.PLAYWRIGHT_BASE_URL }}
-        CONTENT_API_BASE_URL: ${{ secrets.CONTENT_API_BASE_URL }}
-        SPACE_ID: ${{ secrets.SPACE_ID }}
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        EMPLOYEE_EMAIL: ${{ secrets.EMPLOYEE_EMAIL }}
-        EMPLOYEE_PASSWORD: ${{ secrets.EMPLOYEE_PASSWORD }}
-        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        PLAYWRIGHT_baseUrl: ${{ secrets.PLAYWRIGHT_BASE_URL || 'https://compassion-care.ai.studio/' }}
+        CONTENT_API_BASE_URL: ${{ secrets.CONTENT_API_BASE_URL || 'https://compassion-care.ai.studio/api/content' }}
+        SPACE_ID: ${{ secrets.SPACE_ID || 'ccspace_8a39b2' }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || 'cc_cda_token_9e4f21' }}
+        EMPLOYEE_EMAIL: ${{ secrets.EMPLOYEE_EMAIL || 'wena@wen.ca' }}
+        EMPLOYEE_PASSWORD: ${{ secrets.EMPLOYEE_PASSWORD || 'admin' }}
+        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL || 'dizonrl20@gmail.com' }}
+        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin' }}
 
     - name: Upload HTML Test Report
       uses: actions/upload-artifact@v4

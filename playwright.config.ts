@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, ".env.test") });
 dotenv.config({ path: path.resolve(__dirname, ".env.tests") });
 
-const baseUrl = process.env.PLAYWRIGHT_baseUrl || "http://localhost:3000/";
+const baseUrl = process.env.PLAYWRIGHT_baseUrl || process.env.PLAYWRIGHT_BASE_URL || "https://compassion-care.ai.studio/";
 
 export default defineConfig({
   testDir: "./tests",

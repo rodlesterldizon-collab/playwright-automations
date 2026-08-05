@@ -111,9 +111,9 @@ export function formatDateToLabel(dateString: string): string {
  * @param {string} pageId - Target page ID (e.g., 'home', 'corporate')
  */
 export async function fetchCmsContent(request: APIRequestContext, pageId: string): Promise<CmsContent> {
-  const apiBase = process.env.CONTENT_API_BASE_URL || "http://localhost:3000/api/content";
-  const spaceId = process.env.SPACE_ID || "ccspace_ID";
-  const token = process.env.ACCESS_TOKEN || "cc_cda_token_number";
+  const apiBase = process.env.CONTENT_API_BASE_URL || "https://compassion-care.ai.studio/api/content";
+  const spaceId = process.env.SPACE_ID || "ccspace_8a39b2";
+  const token = process.env.ACCESS_TOKEN || "cc_cda_token_9e4f21";
 
   const response = await request.get(`${apiBase}/${spaceId}/${pageId}?access_token=${token}`);
   if (!response.ok()) {
@@ -143,7 +143,7 @@ export async function setupCmsPage(page: Page, request: APIRequestContext, pageI
  * Bypasses the UI login page to speed up test execution.
  */
 export async function loginProgrammatic(context: BrowserContext, request: APIRequestContext, email: string, loginPass: string): Promise<void> {
-  const baseUrl = process.env.PLAYWRIGHT_baseUrl || "http://localhost:3000/";
+  const baseUrl = process.env.PLAYWRIGHT_baseUrl || process.env.PLAYWRIGHT_BASE_URL || "https://compassion-care.ai.studio/";
 
   const response = await request.post(`${baseUrl}api/auth/login`, {
     data: { email, password: loginPass },
