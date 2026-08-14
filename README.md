@@ -182,6 +182,25 @@ Every test across all spec files is tagged with a standardized ID prefix (`[Test
 
 ---
 
+## ⏸️ Skipped Tests Note (104 Active / 22 Skipped)
+
+The 22 skipped scenarios (such as stateful CRUD and auth endpoints) are temporarily bypassed to avoid hitting 429 rate limits and quota restrictions on the free-tier demo environment.
+
+---
+
+## 🏗️ Architecture Scope & Enterprise Roadmap
+
+This test suite is designed as a **clean, modular demonstration framework** showcasing core automation patterns—Page Object Model (POM), multi-viewport matrix testing, AJV JSON schema contract validation, and GitHub Actions CI pipelines—optimized to run reliably in free-tier container environments without infrastructure costs.
+
+### Enterprise Scaling Roadmap
+In a full enterprise production test organization, this foundation easily extends to include:
+- **Ephemeral Test Environments & Data Teardown**: Dynamic database seeding and lifecycle hooks (`test.afterAll`) for zero-pollution stateful testing.
+- **Distributed CI Sharding**: Parallel multi-node test distribution (`--shard=1/4`) with automated flakiness quarantining.
+- **Synthetic Monitoring**: Scheduled production smoke suites and latency SLAs integrated with alerting (Slack/PagerDuty).
+- **Identity & Vault Integration**: Dedicated staging OAuth service accounts and automated secret rotation.
+
+---
+
 ## 📱 Viewport Compatibility Testing System
 
 To guarantee absolute consistency and prevent state pollution, viewport-specific tests are decoupled from manual inline viewport overrides (`page.setViewportSize`) and managed dynamically through native **Playwright Projects** in `playwright.config.ts`:
