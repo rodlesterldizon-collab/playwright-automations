@@ -265,10 +265,10 @@ The repository provides two automated GitHub Actions workflows:
 - Publishes isolated `playwright-smoke-report` artifacts.
 
 ### Container & Infrastructure Decisions:
-- **Official Playwright Docker Image**: Runs inside `mcr.microsoft.com/playwright:v1.50.1-jammy` with pre-installed browser binaries (Chromium, Firefox, WebKit) and OS-level dependencies.
+- **Official Playwright Docker Image**: Runs inside `mcr.microsoft.com/playwright:v1.62.1-jammy` with pre-installed browser binaries (Chromium, Firefox, WebKit) and OS-level dependencies.
 - **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` prevents redundant browser binary downloads during dependency installation, saving 1–2 minutes per run.
 - **`npm install` vs. `npm ci` Architecture Decision**: 
-  - The pipeline intentionally uses `npm install` rather than `npm ci` because CI runs inside the pre-baked Ubuntu Jammy Linux container (`mcr.microsoft.com/playwright:v1.50.1-jammy`). 
+  - The pipeline intentionally uses `npm install` rather than `npm ci` because CI runs inside the pre-baked Ubuntu Jammy Linux container (`mcr.microsoft.com/playwright:v1.62.1-jammy`). 
   - When contributors work across macOS (Apple Silicon ARM64) and Windows, `package-lock.json` records host-specific optional binary trees (such as `esbuild` or `rollup`). Running `npm ci` inside a Linux container strictly enforces exact lockfile platform hashes and can fail with platform architecture mismatch errors (`EUSAGE`/`ETARGET`).
   - `npm install` dynamically resolves the required Linux `x64` binaries inside the container while preserving caching via `actions/cache@v4`.
   - *Standard Host VM Alternative*: If switching from the pre-baked container to a standard `ubuntu-latest` runner (where `npx playwright install --with-deps` is executed per run), `npm ci` can be cleanly re-enabled.

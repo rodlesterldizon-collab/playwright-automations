@@ -16,7 +16,7 @@ jobs:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     container:
-      image: mcr.microsoft.com/playwright:v1.50.1-jammy
+      image: mcr.microsoft.com/playwright:v1.62.1-jammy
 
     steps:
     - name: Checkout Repository
