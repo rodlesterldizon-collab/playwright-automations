@@ -1,0 +1,55 @@
+name: Fast PR Gate (Smoke Suite)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  smoke-tests:
+    name: Run Smoke Tests (@smoke)
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-jammy
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Cache Node Modules
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Dependencies
+      run: npm install
+      env:
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+    - name: Run Playwright Smoke Tests in Parallel
+      run: npm run test:smoke:parallel
+      env:
+        PLAYWRIGHT_baseUrl: ${{ secrets.PLAYWRIGHT_BASE_URL || secrets.PLAYWRIGHT_BASEURL || 'https://compassion-care.ai.studio/' }}
+        CONTENT_API_BASE_URL: ${{ secrets.CONTENT_API_BASE_URL || 'https://compassion-care.ai.studio/api/content' }}
+        SPACE_ID: ${{ secrets.SPACE_ID || '' }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || '' }}
+        EMPLOYEE_EMAIL: ${{ secrets.EMPLOYEE_EMAIL || '' }}
+        EMPLOYEE_PASSWORD: ${{ secrets.EMPLOYEE_PASSWORD || '' }}
+        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL || '' }}
+        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || '' }}
+
+    - name: Upload Smoke HTML Test Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-smoke-report
+        path: playwright-report/
+        retention-days: 14

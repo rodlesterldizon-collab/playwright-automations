@@ -251,9 +251,20 @@ Run test suites targeted by specific directories or layers:
 
 ---
 
-## 🔄 CI/CD Pipeline & Docker Container Optimizations
+## 🔄 CI/CD Pipelines & Docker Container Optimizations
 
-Automated workflow (`.github/workflows/playwright.yml`):
+The repository provides two automated GitHub Actions workflows:
+
+### 1. Full E2E & API Suite (`.github/workflows/playwright.yml`)
+- Executes the full testing matrix (Desktop, Mobile, Tablet, CMS API, Submissions, Auth).
+- Triggers on push & pull request to `main`/`master`.
+
+### 2. Dedicated Fast Smoke Pipeline (`.github/workflows/playwright-smoke.yml`)
+- Executes **only tests tagged with `@smoke`** in parallel across 4 workers (`npm run test:smoke:parallel`).
+- Provides sub-minute rapid health checks on PRs, pushes, and manual `workflow_dispatch` triggers.
+- Publishes isolated `playwright-smoke-report` artifacts.
+
+### Container & Infrastructure Decisions:
 - **Official Playwright Docker Image**: Runs inside `mcr.microsoft.com/playwright:v1.62.1-jammy` with pre-installed browser binaries (Chromium, Firefox, WebKit) and OS-level dependencies.
 - **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` prevents redundant browser binary downloads during dependency installation, saving 1–2 minutes per run.
 - **`npm install` vs. `npm ci` Architecture Decision**: 
@@ -264,4 +275,4 @@ Automated workflow (`.github/workflows/playwright.yml`):
 - **Graceful Secret Degradation for Public PRs**: The workflow provides fallback defaults for tokens so public forks and unauthenticated PRs can still run the entire public UI, viewport matrix, and schema validation test suites without failing immediately on missing staging credentials. In private enterprise repositories, strict entry-level secret validation can be enforced.
 - **Dependency Caching**: Utilizes `actions/cache@v4` on `~/.npm` keyed against `package-lock.json` for rapid step execution.
 - **Secrets & Environment Integration**: Consumes GitHub Secrets (`PLAYWRIGHT_BASE_URL`, `CONTENT_API_BASE_URL`, `SPACE_ID`, `ACCESS_TOKEN`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, etc.).
-- **Artifact Generation**: Automatically uploads interactive HTML Playwright execution report artifacts retained for 30 days.
+- **Artifact Generation**: Automatically uploads interactive HTML Playwright execution report artifacts retained for 30 days (14 days for smoke).
