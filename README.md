@@ -233,6 +233,8 @@ Run test suites targeted by specific directories or layers:
 | Target Scope | Command | Description |
 | :--- | :--- | :--- |
 | **All Tests** | `npx playwright test` | Run entire E2E and API test suite |
+| **Smoke Tests** | `npm run test:smoke` | Run critical path smoke tests (`@smoke`) |
+| **Smoke Tests (Parallel)** | `npm run test:smoke:parallel` | Run smoke tests concurrently across 4 workers |
 | **UI Mode** | `npx playwright test --ui` | Open interactive Playwright UI runner |
 | **Mobile Tests** | `npx playwright test --project=mobile` | Run all mobile viewport UI page specs (`375x812`) |
 | **Tablet Tests** | `npx playwright test --project=tablet` | Run all tablet viewport UI page specs (`768x1024`) |

@@ -6,7 +6,7 @@ const partnersData = getPartnersData();
 test.describe("Corporate Partnerships Spec", () => {
   // ─── Hero Section ─────────────────────────────────────────────────────────────
 
-  test("[Test_01] should render the corporate branding hero and navigation triggers", async ({ partnersPage, corporateCms }) => {
+  test("[Test_01] @smoke should render the corporate branding hero and navigation triggers", async ({ partnersPage, corporateCms }) => {
     const { navigation, hero } = corporateCms;
     const { hero: heroSection } = partnersPage;
 

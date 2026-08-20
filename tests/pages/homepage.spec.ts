@@ -6,7 +6,7 @@ const homeData = getHomeData();
 test.describe("Public Landing Homepage E2E Spec", () => {
   // ─── Hero Section ────────────────────────────────────────────────────────────
 
-  test("[Test_01] should render the hero section using CMS copy and verify CTAs scroll correctly", async ({ page, homePage, homeCms }) => {
+  test("[Test_01] @smoke should render the hero section using CMS copy and verify CTAs scroll correctly", async ({ page, homePage, homeCms }) => {
     const { hero } = homePage;
 
     // Badge / trust signal

@@ -4,7 +4,7 @@ import { getAuthData } from "../helpers.js";
 test.describe("Staff Identity & Access Management Spec", () => {
   const authData = getAuthData();
 
-  test("[Test_01] should display the core login forms and visual credentials input", async ({ loginPage }) => {
+  test("[Test_01] @smoke should display the core login forms and visual credentials input", async ({ loginPage }) => {
     await expect(loginPage.pageTitle).toBeVisible();
     await expect(loginPage.sectionHeading).toBeVisible();
     await expect(loginPage.sectionSubheading).toBeVisible();

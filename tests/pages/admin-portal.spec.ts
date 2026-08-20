@@ -1,7 +1,7 @@
 import { test, expect } from "../../fixtures/page-objects.fixture.js";
 
 test.describe("Administrative Portal Management Page Spec", () => {
-  test("[Test_01] should support staff registry auditing and employee state switches", async ({ adminPortalPage }) => {
+  test("[Test_01] @smoke should support staff registry auditing and employee state switches", async ({ adminPortalPage }) => {
     // Switch to Employee Registry tab
     await adminPortalPage.registry.registryTab.click();
 
