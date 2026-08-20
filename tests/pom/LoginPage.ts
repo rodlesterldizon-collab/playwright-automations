@@ -39,4 +39,24 @@ export class LoginPage extends BasePage {
     this.requestSubmittedMessage = page.locator("text=/Request Submitted/i");
     this.googleSsoButton = page.locator("button:has-text('Sign in with Google SSO')");
   }
+
+  async navigate(): Promise<void> {
+    await this.page.goto("/login");
+  }
+
+  async submitItSupportRequest(email: string): Promise<void> {
+    await this.contactItSupportLink.click();
+    await this.supportEmailInput.fill(email);
+    await this.itSupportSubmitButton.click();
+  }
+
+  async triggerForgotPassword(): Promise<string> {
+    let dialogMessage = "";
+    this.page.once("dialog", async (dialog) => {
+      dialogMessage = dialog.message();
+      await dialog.accept();
+    });
+    await this.forgotPasswordLink.click();
+    return dialogMessage;
+  }
 }

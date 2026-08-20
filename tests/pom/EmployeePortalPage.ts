@@ -32,4 +32,28 @@ export class EmployeePortalPage extends BasePage {
     this.stayLoggedInButton = page.locator('button:has-text("Stay Logged In")');
     this.sessionTimeoutMessage = page.locator("text=Session timed out due to inactivity");
   }
+
+  async navigate(): Promise<void> {
+    await this.page.goto("/dashboard");
+  }
+
+  async selectFirstShift(): Promise<void> {
+    await this.shiftSelectorFirst.check();
+  }
+
+  async clockIn(): Promise<void> {
+    await this.clockInButton.click();
+  }
+
+  async clockOut(): Promise<void> {
+    await this.clockOutButton.click();
+  }
+
+  async completeShift(): Promise<void> {
+    await this.completeButton.click();
+  }
+
+  async stayLoggedIn(): Promise<void> {
+    await this.stayLoggedInButton.click();
+  }
 }

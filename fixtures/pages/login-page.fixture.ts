@@ -7,6 +7,8 @@ type LoginPageDefinitions = {
 
 export const test = base.extend<LoginPageDefinitions>({
   loginPage: async ({ page, request }, use) => {
-    await use(new LoginPage(page, request));
+    const loginPage = new LoginPage(page, request);
+    await loginPage.navigate();
+    await use(loginPage);
   },
 });

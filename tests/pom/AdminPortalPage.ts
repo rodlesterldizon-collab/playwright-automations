@@ -69,6 +69,28 @@ export class AdminSchedulerSection {
   getShiftDeleteButton(clientName: string): Locator {
     return this.getShiftCard(clientName).locator("button").first();
   }
+
+  async assignShift(shiftData: {
+    employee?: string;
+    clientName: string;
+    date: string;
+    location: string;
+    notes: string;
+  }): Promise<void> {
+    if (shiftData.employee) {
+      await this.employeeDropdown.selectOption({ label: shiftData.employee });
+    }
+    await this.clientNameInput.fill(shiftData.clientName);
+    await this.dateInput.fill(shiftData.date);
+    await this.locationInput.fill(shiftData.location);
+    await this.notesTextarea.fill(shiftData.notes);
+    await this.assignShiftButton.click();
+  }
+
+  async deleteShift(clientName: string): Promise<void> {
+    await this.getShiftDeleteButton(clientName).click();
+    await this.confirmDeletionButton.click();
+  }
 }
 
 // ─── Leave Approvals Section ─────────────────────────────────────────────────
@@ -113,6 +135,13 @@ export class AdminFeatureFlagsSection {
   getSidebarLink(text: string): Locator {
     return this.page.locator("aside").locator(`text=${text}`);
   }
+
+  async toggleFlag(portalTab: string, flagKey: string): Promise<void> {
+    await this.featureFlagsButton.click();
+    await this.getPortalTab(portalTab).click();
+    await this.getToggleByKey(flagKey).click();
+    await this.applyConfigButton.click();
+  }
 }
 
 // ─── AdminPortalPage ─────────────────────────────────────────────────────────
@@ -129,5 +158,9 @@ export class AdminPortalPage extends BasePage {
     this.scheduler = new AdminSchedulerSection(page);
     this.leaveApprovals = new AdminLeaveApprovalsSection(page);
     this.featureFlags = new AdminFeatureFlagsSection(page);
+  }
+
+  async navigate(): Promise<void> {
+    await this.page.goto("/admin");
   }
 }

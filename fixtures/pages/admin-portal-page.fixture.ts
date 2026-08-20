@@ -10,6 +10,8 @@ export const test = base.extend<AdminPortalPageDefinitions>({
   adminPortalPage: async ({ context, page, request }, use) => {
     const credentials = getAdminCredentials();
     await loginProgrammatic(context, request, credentials.email, credentials.password);
-    await use(new AdminPortalPage(page, request));
+    const adminPortalPage = new AdminPortalPage(page, request);
+    await adminPortalPage.navigate();
+    await use(adminPortalPage);
   },
 });

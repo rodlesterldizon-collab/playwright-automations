@@ -10,6 +10,8 @@ export const test = base.extend<EmployeePortalPageDefinitions>({
   employeePortalPage: async ({ context, page, request }, use) => {
     const credentials = getCaregiverCredentials();
     await loginProgrammatic(context, request, credentials.email, credentials.password);
-    await use(new EmployeePortalPage(page, request));
+    const employeePortalPage = new EmployeePortalPage(page, request);
+    await employeePortalPage.navigate();
+    await use(employeePortalPage);
   },
 });
