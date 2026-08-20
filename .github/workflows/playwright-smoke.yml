@@ -15,7 +15,10 @@ jobs:
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
     container:
-      image: mcr.microsoft.com/playwright:v1.62.1-jammy
+      image: ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - name: Checkout Repository
