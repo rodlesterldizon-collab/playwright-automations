@@ -265,7 +265,7 @@ The repository provides two automated GitHub Actions workflows:
 - Publishes isolated `playwright-smoke-report` artifacts.
 
 ### Container & Infrastructure Decisions:
-- **Custom Enterprise GHCR Docker Image**: Runs inside `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:latest` with pre-installed browser binaries (Noble LTS / Playwright v1.50.1) and non-root execution support.
+- **Custom Enterprise GHCR Docker Image**: Runs inside `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.50.1` with pre-installed browser binaries (Noble LTS / Playwright v1.50.1) and non-root execution support.
 - **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` prevents redundant browser binary downloads during dependency installation, saving 1–2 minutes per run.
 - **`npm install` vs. `npm ci` Architecture Decision**: 
   - The pipeline intentionally uses `npm install` rather than `npm ci` because CI runs inside the pre-baked Ubuntu Jammy Linux container (`mcr.microsoft.com/playwright:v1.62.1-jammy`). 

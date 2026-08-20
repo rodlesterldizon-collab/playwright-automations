@@ -13,8 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     container:
-      image: ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:latest
+      image: ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.50.1
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
