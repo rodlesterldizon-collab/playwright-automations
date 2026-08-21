@@ -251,134 +251,46 @@ Run test suites targeted by specific directories or layers:
 
 ---
 
-## 🔄 CI/CD Pipelines & Docker Container Optimizations
+## 🔄 CI/CD Pipelines & Universal Test Runner
 
-The repository provides two automated GitHub Actions workflows:
+The repository uses our centralized **Playwright & Node.js Universal Test Runner** container hosted on GitHub Container Registry (GHCR).
 
-### 1. Full E2E & API Suite (`.github/workflows/playwright.yml`)
-- Executes the full testing matrix (Desktop, Mobile, Tablet, CMS API, Submissions, Auth).
-- Triggers on push & pull request to `main`/`master`.
+### 🚀 Workflows (`.github/workflows/`)
 
-### 2. Dedicated Fast Smoke Pipeline (`.github/workflows/playwright-smoke.yml`)
-- Executes **only tests tagged with `@smoke`** in parallel across 4 workers (`npm run test:smoke:parallel`).
-- Provides sub-minute rapid health checks on PRs, pushes, and manual `workflow_dispatch` triggers.
-- Publishes isolated `playwright-smoke-report` artifacts.
+- **Full Suite (`playwright.yml`)**: Runs all Desktop, Mobile, Tablet, and backend API test matrices on push & PR.
+- **Fast Smoke Gate (`playwright-smoke.yml`)**: Runs parallel `@smoke` tests (`npm run test:smoke:parallel`) in under a minute on PRs and pushes.
 
 ---
 
-## 🐳 Universal Test Runner Container (GitHub Container Registry)
+### 🐳 Test Runner Container Configuration
 
-> **🚀 Custom Test Container Package**: Published by Rod Lester L. Dizon in `rodlesterldizon-collab/core-test-suite`.  
-> **📦 GitHub Packages URL**: [github.com/rodlesterldizon-collab?tab=packages](https://github.com/rodlesterldizon-collab?tab=packages)  
-> **🐳 Public Pull Command**: `docker pull ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1`
+**Container Image**: `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1`  
+*(Pre-baked with Ubuntu 24.04 Noble, Node.js LTS, Playwright v1.62.1, and Chromium/Firefox/WebKit at `/ms-playwright`)*
 
-A centralized, reusable, and custom-architected Playwright & Node.js Test Runner Container published to GitHub Container Registry (GHCR). It comes pre-configured with Node.js LTS, npm, Playwright test dependencies, and all browser binaries (Chromium, Firefox, WebKit) so consuming repositories run automated tests immediately without downloading browsers or OS dependencies on every CI run.
-
-### 📦 Container Identity & Package Registry
-
-| Property | Value |
-| :--- | :--- |
-| **Maintainer & Publisher** | Rod ([@rodlesterldizon-collab](https://github.com/rodlesterldizon-collab)) |
-| **Package Location** | `github.com/rodlesterldizon-collab?tab=packages` |
-| **Registry** | GitHub Container Registry (`ghcr.io`) |
-| **Full Container Name** | `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner` |
-| **Pinned Version Tag** | `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1` |
-| **Latest Tag** | `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:latest` |
-| **Commit SHA Tag** | `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:sha-<commit-sha>` |
-| **Base OS** | Ubuntu 24.04 LTS (Noble) |
-| **Pre-installed Engine** | Node.js LTS, npm latest, Playwright v1.62.1 |
-| **Pre-baked Browsers** | Chromium, Firefox, WebKit (located at `/ms-playwright`) |
-| **Pre-installed CLI Tools** | `curl`, `wget`, `jq`, `iputils-ping`, `ca-certificates` |
-
----
-
-### 🔒 Token & Secret Management (Zero Exposure)
-
-> **Important**: Never commit GitHub tokens, Personal Access Tokens (PATs), or credentials to git or publish them in code.
-
-#### 1. Local Environment (`.env`)
-For running the container or logging in to GHCR locally on your machine, store your credentials in a local `.env` file (which is git-ignored):
-
-```bash
-# Copy .env.example to create your local .env
-cp .env.example .env
-```
-
-Add your GitHub username and Personal Access Token (PAT with `read:packages` scope) to `.env`:
-```env
-GITHUB_ACTOR=rodlesterldizon-collab
-GITHUB_TOKEN=ghp_yourActualSecretTokenHere
-CONTAINER_IMAGE_NAME=ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner
-CONTAINER_TAG=v1.62.1
-```
-
-Authenticate with GHCR using environment variables without leaking tokens into shell history:
-```bash
-# Load environment variables from .env securely
-export $(grep -v '^#' .env | xargs)
-
-# Log in to GitHub Container Registry
-echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
-```
-
-#### 2. GitHub Actions CI/CD Secrets (Consuming Repositories)
-
-##### Option A: Built-in `GITHUB_TOKEN` (Recommended for Org/Account Repositories)
-When cross-repository read access is granted in GHCR package settings, consuming workflows use the default ephemeral token:
 ```yaml
+# Used in .github/workflows/playwright.yml & playwright-smoke.yml
+env:
+  PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
 container:
   image: ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1
   credentials:
     username: ${{ github.actor }}
-    password: ${{ secrets.GITHUB_TOKEN }}
-  options: --ipc=host
-```
-
-##### Option B: GitHub Actions Repository Secret (`CR_PAT` or `GH_TOKEN`)
-For private repositories or separate organizations requiring a dedicated PAT:
-1. Navigate to **Settings → Secrets and variables → Actions → New repository secret**.
-2. Name the secret `CR_PAT` (or `GH_TOKEN`) and paste your PAT value.
-3. Reference it in your workflow:
-```yaml
-container:
-  image: ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1
-  credentials:
-    username: ${{ secrets.GHCR_USER || github.actor }}
     password: ${{ secrets.CR_PAT }}
   options: --ipc=host
 ```
 
 ---
 
-### 📊 Performance Benchmark: Custom Noble Container vs. Microsoft Jammy Container
+### ⚡ Key Performance & CI Features
 
-Below is a side-by-side benchmark from actual CI runs executing **126 End-to-End Tests** (104 passed, 22 skipped):
-
-| Benchmark Metric | Official Microsoft Jammy Container (`v1.62.1-jammy`) | Centralized Noble Container (`core-test-suite/test-runner:v1.62.1`) | Impact / Savings |
-| :--- | :--- | :--- | :--- |
-| **Base OS** | Ubuntu 22.04 LTS (Jammy) | Ubuntu 24.04 LTS (Noble) | Modern kernel, updated toolchain |
-| **Playwright Test Execution (126 tests)** | 55.8 seconds | 40.3 seconds | ⚡ **27.8% faster** test execution (~15.5s saved) |
-| **Browser Download Overhead** | Skipped (pre-baked) | Skipped (pre-baked at `/ms-playwright`) | **0 seconds** download delay |
-| **Package Management** | Standard `npm install` (~8-9s) | `npm ci` Clean Install (~8s) | Deterministic lockfile compliance |
-| **Artifact Packaging & Upload** | ~1s | ~1s | Instant reporting |
-| **Overall Job Duration** | ~1m 45s | ~1m 10s | **35 seconds saved** per CI push |
-
-#### Why is this running exceptionally well?
-1. **Zero Browser Downloads**: Pre-baked Chromium, Firefox, and WebKit binaries are loaded immediately from `/ms-playwright` with zero network overhead (`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`).
-2. **Optimized OS Layer**: Ubuntu 24.04 (Noble) provides superior CPU scheduling, updated Node.js LTS, and reduced I/O latency for headless browser subprocesses.
-3. **Rapid Container Provisioning**: Image layers are cached directly on GHCR, spinning up in seconds with `--ipc=host` shared memory to prevent browser subprocess deadlocks.
-
----
-
-### Container & Infrastructure Decisions:
-- **Centralized Enterprise GHCR Docker Image**: Runs inside `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1` with pre-installed browser binaries (Chromium, Firefox, WebKit at `/ms-playwright`) and OS-level dependencies, with `--ipc=host` enabled for robust headless execution.
-- **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` and `PLAYWRIGHT_BROWSERS_PATH=/ms-playwright` prevent redundant browser binary downloads during dependency installation, saving 1–2 minutes per run.
-- **`npm install` vs. `npm ci` Architecture Decision**: 
-  - The pipeline intentionally uses `npm install` rather than `npm ci` because CI runs inside the pre-baked Ubuntu Jammy Linux container (`mcr.microsoft.com/playwright:v1.62.1-jammy`). 
-  - When contributors work across macOS (Apple Silicon ARM64) and Windows, `package-lock.json` records host-specific optional binary trees (such as `esbuild` or `rollup`). Running `npm ci` inside a Linux container strictly enforces exact lockfile platform hashes and can fail with platform architecture mismatch errors (`EUSAGE`/`ETARGET`).
-  - `npm install` dynamically resolves the required Linux `x64` binaries inside the container while preserving caching via `actions/cache@v4`.
-  - *Standard Host VM Alternative*: If switching from the pre-baked container to a standard `ubuntu-latest` runner (where `npx playwright install --with-deps` is executed per run), `npm ci` can be cleanly re-enabled.
-- **Graceful Secret Degradation for Public PRs**: The workflow provides fallback defaults for tokens so public forks and unauthenticated PRs can still run the entire public UI, viewport matrix, and schema validation test suites without failing immediately on missing staging credentials. In private enterprise repositories, strict entry-level secret validation can be enforced.
-- **Dependency Caching**: Utilizes `actions/cache@v4` on `~/.npm` keyed against `package-lock.json` for rapid step execution.
-- **Secrets & Environment Integration**: Consumes GitHub Secrets (`PLAYWRIGHT_BASE_URL`, `CONTENT_API_BASE_URL`, `SPACE_ID`, `ACCESS_TOKEN`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, etc.).
-- **Artifact Generation**: Automatically uploads interactive HTML Playwright execution report artifacts retained for 30 days (14 days for smoke).
+- **Zero Browser Download Overhead**: Browser binaries are pre-installed in `/ms-playwright`, skipping runtime downloads.
+- **Shared Memory Allocation**: `--ipc=host` prevents browser subprocess memory crashes.
+- **27.8% Faster Execution**: Benchmarked at ~40.3s (vs. ~55.8s on generic images), saving ~35 seconds per CI run.
+- **Authentication**: Authenticated via repository secret `CR_PAT` with `${{ github.actor }}` context.
+- **Local Testing**: Pull the container locally with:
+  ```bash
+  docker pull ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1
+  ```
+- **Artifacts**: HTML Playwright execution reports are automatically uploaded and retained for 30 days (14 days for smoke).
