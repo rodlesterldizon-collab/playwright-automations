@@ -19,7 +19,7 @@ jobs:
       image: ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.CR_PAT }}
       options: --ipc=host
 
     steps:
