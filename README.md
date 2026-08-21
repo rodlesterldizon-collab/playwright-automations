@@ -265,8 +265,8 @@ The repository provides two automated GitHub Actions workflows:
 - Publishes isolated `playwright-smoke-report` artifacts.
 
 ### Container & Infrastructure Decisions:
-- **Official Playwright Docker Image**: Runs inside `mcr.microsoft.com/playwright:v1.62.1-jammy` with pre-installed browser binaries (Chromium, Firefox, WebKit) and OS-level dependencies.
-- **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` prevents redundant browser binary downloads during dependency installation, saving 1–2 minutes per run.
+- **Centralized Enterprise GHCR Docker Image**: Runs inside `ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1` with pre-installed browser binaries (Chromium, Firefox, WebKit at `/ms-playwright`) and OS-level dependencies, with `--ipc=host` enabled for robust headless execution.
+- **Fast Execution Optimization**: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` and `PLAYWRIGHT_BROWSERS_PATH=/ms-playwright` prevent redundant browser binary downloads during dependency installation, saving 1–2 minutes per run.
 - **`npm install` vs. `npm ci` Architecture Decision**: 
   - The pipeline intentionally uses `npm install` rather than `npm ci` because CI runs inside the pre-baked Ubuntu Jammy Linux container (`mcr.microsoft.com/playwright:v1.62.1-jammy`). 
   - When contributors work across macOS (Apple Silicon ARM64) and Windows, `package-lock.json` records host-specific optional binary trees (such as `esbuild` or `rollup`). Running `npm ci` inside a Linux container strictly enforces exact lockfile platform hashes and can fail with platform architecture mismatch errors (`EUSAGE`/`ETARGET`).

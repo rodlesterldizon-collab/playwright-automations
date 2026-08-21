@@ -15,8 +15,13 @@ jobs:
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     container:
-      image: mcr.microsoft.com/playwright:v1.62.1-jammy
+      image: ghcr.io/rodlesterldizon-collab/core-test-suite/test-runner:v1.62.1
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --ipc=host
 
     steps:
     - name: Checkout Repository
